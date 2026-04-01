@@ -162,16 +162,20 @@ const KeyboardBrowser = styled.div`
   margin-bottom: 1.5rem;
 `;
 
+const SearchWrapper = styled.div`
+  position: relative;
+  margin-bottom: 0.75rem;
+`;
+
 const SearchInput = styled.input`
   width: 100%;
-  padding: 0.75rem 1rem;
+  padding: 0.75rem 2.5rem 0.75rem 1rem;
   border: 1px solid var(--border_color_cell);
   border-radius: 8px;
   background: var(--bg_control);
   color: var(--color_label-highlighted);
   font-family: 'Fira Sans', sans-serif;
   font-size: 0.9rem;
-  margin-bottom: 0.75rem;
   box-sizing: border-box;
   outline: none;
   &::placeholder {
@@ -180,6 +184,24 @@ const SearchInput = styled.input`
   }
   &:focus {
     border-color: var(--color_accent);
+  }
+`;
+
+const ClearButton = styled.button`
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--color_label);
+  opacity: 0.5;
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 0.25rem 0.5rem;
+  line-height: 1;
+  &:hover {
+    opacity: 1;
   }
 `;
 
@@ -346,7 +368,13 @@ export const Home: React.FC<HomeProps> = (props) => {
   }, [showKeyboards, keyboards]);
 
   const filteredKeyboards = search
-    ? keyboards.filter((k) => k.toLowerCase().includes(search.toLowerCase()))
+    ? (() => {
+        const terms = search.toLowerCase().split(/\s+/).filter(Boolean);
+        return keyboards.filter((k) => {
+          const lower = k.toLowerCase();
+          return terms.every((term) => lower.includes(term));
+        });
+      })()
     : keyboards;
 
   return !hasHIDSupport && !OVERRIDE_HID_CHECK ? (
@@ -397,17 +425,29 @@ export const Home: React.FC<HomeProps> = (props) => {
 
         {showKeyboards && (
           <KeyboardBrowser>
-            <SearchInput
-              type="text"
-              placeholder="Search keyboards..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              autoFocus
-            />
+            <SearchWrapper>
+              <SearchInput
+                type="text"
+                placeholder="Search keyboards... (e.g. keychron q1)"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                autoFocus
+              />
+              {search && (
+                <ClearButton onClick={() => setSearch('')} aria-label="Clear search">
+                  ×
+                </ClearButton>
+              )}
+            </SearchWrapper>
             <KeyboardList>
-              {filteredKeyboards.slice(0, 200).map((name) => (
+              {filteredKeyboards.slice(0, 100).map((name) => (
                 <KeyboardItem key={name}>{name}</KeyboardItem>
               ))}
+              {filteredKeyboards.length > 100 && (
+                <KeyboardItem style={{opacity: 0.4, textAlign: 'center'}}>
+                  Showing 100 of {filteredKeyboards.length} — refine your search
+                </KeyboardItem>
+              )}
             </KeyboardList>
             <KeyboardCount>
               {search
