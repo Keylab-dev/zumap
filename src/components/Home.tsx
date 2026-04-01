@@ -456,8 +456,8 @@ export const Home: React.FC<HomeProps> = (props) => {
               )}
             </SearchWrapper>
             <KeyboardList>
-              {filteredKeyboards.slice(0, 100).map((name) => (
-                <KeyboardItem key={name}>{name}</KeyboardItem>
+              {filteredKeyboards.slice(0, 100).map((name, idx) => (
+                <KeyboardItem key={`${idx}-${name}`}>{name}</KeyboardItem>
               ))}
               {filteredKeyboards.length > 100 && (
                 <KeyboardItem style={{opacity: 0.4, textAlign: 'center'}}>
