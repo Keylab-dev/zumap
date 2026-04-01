@@ -370,10 +370,26 @@ export const Home: React.FC<HomeProps> = (props) => {
   const filteredKeyboards = search
     ? (() => {
         const terms = search.toLowerCase().split(/\s+/).filter(Boolean);
-        return keyboards.filter((k) => {
+        const matches = keyboards.filter((k) => {
           const lower = k.toLowerCase();
           return terms.every((term) => lower.includes(term));
         });
+        // Score: prioritize word-boundary matches over substring matches
+        // and names starting with the first term
+        const scored = matches.map((k) => {
+          const lower = k.toLowerCase();
+          let score = 0;
+          for (const term of terms) {
+            // Exact word boundary match (e.g. "Q1" matches "Q1" but not "Q10")
+            const regex = new RegExp(`(^|[\\s_\\-])${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}($|[\\s_\\-])`, 'i');
+            if (regex.test(k)) score += 10;
+          }
+          // Bonus if name starts with first search term
+          if (lower.startsWith(terms[0])) score += 5;
+          return {name: k, score};
+        });
+        scored.sort((a, b) => b.score - a.score || a.name.localeCompare(b.name));
+        return scored.map((s) => s.name);
       })()
     : keyboards;
 
