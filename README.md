@@ -1,65 +1,71 @@
-# [VIA Web Application](https://usevia.app) - Your keyboards best friend
+# Zumap
 
-![android-chrome-192x192](https://user-images.githubusercontent.com/1714072/222621960-ddfb8ee6-a486-4c66-8852-b204ba7c807b.png)
+Open-source keyboard configurator for QMK/VIA-compatible mechanical keyboards. Remap keys, create macros, adjust lighting — all from your browser.
 
-[![Azure Static Web Apps CI/CD](https://github.com/the-via/app/actions/workflows/azure.yml/badge.svg)](https://github.com/the-via/app/actions/workflows/azure.yml)
+**[www.zumap.app](https://www.zumap.app)**
 
-VIA is a powerful, open-source web-based interface for configuring your [QMK](https://qmk.fm)-powered mechanical keyboard. It allows you to customize your keymaps, create macros, and adjust RGB settings (if it has RGB) on the fly, without needing to recompile your keyboard's firmware. This makes keyboard customization easier and more accessible for everyone.
+Fork of [VIA](https://github.com/the-via/app), actively maintained.
 
-## Getting VIA to support your keyboard
+## Features
 
-Are you a keyboard maker or a developer interested in adding support for your keyboard? We welcome contributions to the VIA project!
+- **Visual key remapping** — click a key, pick a keycode, done
+- **Layer support** — configure multiple layers with tap/hold, mod-tap, and more
+- **Macro editor** — record and assign key sequences
+- **RGB/lighting controls** — adjust effects, colors, brightness
+- **Key tester** — test every key on your board
+- **1800+ keyboards supported** — browse the full list on the welcome page
+- **No install required** — runs entirely in the browser via WebHID
 
-1. The source code of the keyboard **has to be merged** in [QMK Firmware Repositories](https://github.com/qmk/qmk_firmware) Master branch.
-2. Your `keymaps/via` keymap **has to be merged** in [VIA's QMK Userspace Repository](https://github.com/the-via/qmk_userspace_via) Main branch.
-3. Create a definition in JSON format for your keyboard and submit it as a pull request to [VIA's Keyboards Repository](https://github.com/the-via/keyboards) Master branch.
+## Browser Support
 
-Please follow our [Specification documentation](https://www.caniusevia.com/docs/specification) carefully to ensure your pull request is smoothly reviewed and merged.
+Keyboard connection requires [WebHID](https://caniuse.com/?search=webhid):
 
-## Local development setup
+| Browser | Status |
+|---------|--------|
+| Chrome | Supported |
+| Edge | Supported |
+| Safari | Not supported |
+| Firefox | Not supported |
 
-Start by cloning [`the-via/keyboards`](github.com/the-via/keyboards) then install dependencies with `npm install` and finally `npm run build`. You should see
-the output folder `dist`. This should be copied or symlinked to our repo's `public/definitions` folder.
+The welcome page and keyboard browser work in all browsers.
+
+## Development
 
 ```bash
-# Inside the-via/app
-public/definitions -> ../../keyboards/dist
+git clone https://github.com/Keylab-dev/zumap.git
+cd zumap
+npm install
+npm run dev
 ```
 
-### Useful commands
+Keyboard definitions are fetched from the [VIA keyboards repo](https://github.com/the-via/keyboards) during build:
 
-#### `npm run dev`
+```bash
+npm run build:kbs   # builds definitions to public/definitions/
+npm run build       # full production build
+```
 
-Runs the app in the development mode.
-Open [http://localhost:5173](http://localhost:5173) to view it in the browser.
+## Project Structure
 
-The page will reload if you make edits.
-You will also see any lint errors in the console.
+```
+src/
+  components/
+    Home.tsx              — Welcome page + keyboard browser
+    menus/                — Navigation bar, external links
+    panes/                — Configure, Test, Design, Settings, Debug
+    three-fiber/          — 3D keyboard renderer
+    two-string/           — 2D keyboard renderer
+    icons/                — Logo and icon components
+  store/                  — Redux state (devices, keymaps, definitions)
+  utils/                  — USB/HID, keycodes, keyboard API
+public/
+  definitions/            — Built keyboard definition files
+```
 
-#### `npm run build`
+## Contributing
 
-Builds a static copy of your site to the `build/` folder.
-Your app is ready to be deployed!
+Contributions welcome. Please open an issue first for significant changes.
 
-#### `npm run test`
+## License
 
-Launches the application test runner.
-Run with the `--watch` flag (`npm test -- --watch`) to run in interactive watch mode.
-
----
-
-This project is tested with [BrowserStack](https://www.browserstack.com/).
-
-## Looking for an offline app?
-
-@cebby2420 has kindly made a desktop app that does so.
-
-You can find it at [https://github.com/cebby2420/via-desktop](https://github.com/cebby2420/via-desktop).
-
-**NOTE: This project has no official affiliation with VIA, and we cannot provide support for it.**
-
-## Facing Issues?
-
-If you encounter any issues or bugs while using the [VIA web application](https://usevia.app), please report them by opening an issue in the [Issues section](https://github.com/the-via/app/issues). This will help us to track down and resolve problems, and improve the VIA experience for everyone.
-
-Before reporting, please make sure to check if an issue has already been reported. Thank you!
+GPL-3.0 — same as the original VIA project.
