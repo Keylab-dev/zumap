@@ -1,7 +1,7 @@
 {
-    "name": "VIA",
-	"short_name": "VIA",
-	"description": "VIA - Your keyboard's best friend",
+    "name": "Zumap",
+	"short_name": "Zumap",
+	"description": "Zumap — Open-source keyboard configurator",
 	"start_url": ".",
     "icons": [
         {

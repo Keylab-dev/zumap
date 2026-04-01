@@ -31,6 +31,111 @@ import {
 import {OVERRIDE_HID_CHECK} from 'src/utils/override';
 import {KeyboardValue} from 'src/utils/keyboard-api';
 import {useTranslation} from 'react-i18next';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faKeyboard, faPlug, faGlobe, faCodeBranch} from '@fortawesome/free-solid-svg-icons';
+import {faChrome} from '@fortawesome/free-brands-svg-icons';
+
+const WelcomeHome = styled.div`
+  background: var(--bg_gradient);
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  height: 100%;
+  overflow: auto;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  position: absolute;
+  border-top: 1px solid var(--border_color_cell);
+`;
+
+const WelcomeContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  padding: 3rem 1.5rem;
+  color: var(--color_label);
+`;
+
+const Logo = styled.h1`
+  font-family: 'Fira Sans Condensed', sans-serif;
+  font-weight: 500;
+  font-size: 2.5rem;
+  letter-spacing: 0.1em;
+  margin: 0 0 0.5rem;
+  color: var(--color_accent);
+`;
+
+const Tagline = styled.p`
+  font-size: 1.1rem;
+  color: var(--color_label);
+  opacity: 0.7;
+  margin: 0 0 3rem;
+`;
+
+const CardGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+  max-width: 720px;
+  width: 100%;
+  margin-bottom: 3rem;
+`;
+
+const Card = styled.div`
+  background: var(--bg_control);
+  border: 1px solid var(--border_color_cell);
+  border-radius: 8px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+`;
+
+const CardIcon = styled.div`
+  font-size: 1.25rem;
+  color: var(--color_accent);
+`;
+
+const CardTitle = styled.h3`
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin: 0;
+`;
+
+const CardDesc = styled.p`
+  font-size: 0.85rem;
+  margin: 0;
+  opacity: 0.6;
+  line-height: 1.5;
+`;
+
+const BrowserNote = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--bg_control);
+  border: 1px solid var(--border_color_cell);
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  max-width: 720px;
+  width: 100%;
+  font-size: 0.85rem;
+  opacity: 0.8;
+`;
+
+const BrowserIcon = styled.span`
+  font-size: 1.1rem;
+  color: var(--color_accent);
+  flex-shrink: 0;
+`;
+
+const Link = styled.a`
+  color: var(--color_accent);
+  text-decoration: underline;
+`;
 
 const ErrorHome = styled.div`
   background: var(--bg_gradient);
@@ -46,31 +151,6 @@ const ErrorHome = styled.div`
   padding-top: 24px;
   position: absolute;
   border-top: 1px solid var(--border_color_cell);
-`;
-
-const UsbError = styled.div`
-  align-items: center;
-  display: flex;
-  color: var(--color_label);
-  flex-direction: column;
-  height: 100%;
-  justify-content: center;
-  margin: 0 auto;
-  max-width: 650px;
-  text-align: center;
-`;
-
-const UsbErrorIcon = styled.div`
-  font-size: 2rem;
-`;
-
-const UsbErrorHeading = styled.h1`
-  margin: 1rem 0 0;
-`;
-
-const UsbErrorWebHIDLink = styled.a`
-  text-decoration: underline;
-  color: var(--color_label-highlighted);
 `;
 
 const timeoutRepeater =
@@ -172,23 +252,64 @@ export const Home: React.FC<HomeProps> = (props) => {
   }, [api]);
 
   return !hasHIDSupport && !OVERRIDE_HID_CHECK ? (
-    <ErrorHome ref={homeElem} tabIndex={0}>
-      <UsbError>
-        <UsbErrorIcon>❌</UsbErrorIcon>
-        <UsbErrorHeading>{t('USB Detection Error')}</UsbErrorHeading>
-        <p>
-          Looks like there was a problem getting USB detection working. Right
-          now, we only support{' '}
-          <UsbErrorWebHIDLink
-            href="https://caniuse.com/?search=webhid"
-            target="_blank"
-          >
-            browsers that have WebHID enabled
-          </UsbErrorWebHIDLink>
-          , so make sure yours is compatible before trying again.
-        </p>
-      </UsbError>
-    </ErrorHome>
+    <WelcomeHome ref={homeElem} tabIndex={0}>
+      <WelcomeContainer>
+        <Logo>ZUMAP</Logo>
+        <Tagline>Open-source keyboard configurator</Tagline>
+
+        <CardGrid>
+          <Card>
+            <CardIcon>
+              <FontAwesomeIcon icon={faPlug} />
+            </CardIcon>
+            <CardTitle>Connect your keyboard</CardTitle>
+            <CardDesc>
+              Plug in any QMK/VIA-compatible keyboard and remap keys, create
+              macros, and adjust lighting — all from your browser.
+            </CardDesc>
+          </Card>
+
+          <Card>
+            <CardIcon>
+              <FontAwesomeIcon icon={faKeyboard} />
+            </CardIcon>
+            <CardTitle>Hundreds of keyboards</CardTitle>
+            <CardDesc>
+              Supports a growing database of mechanical keyboards. If your board
+              runs VIA-compatible firmware, it works here.
+            </CardDesc>
+          </Card>
+
+          <Card>
+            <CardIcon>
+              <FontAwesomeIcon icon={faCodeBranch} />
+            </CardIcon>
+            <CardTitle>Community-driven</CardTitle>
+            <CardDesc>
+              Fork of VIA, actively maintained. Open source and welcoming
+              contributions from the keyboard community.
+            </CardDesc>
+          </Card>
+        </CardGrid>
+
+        <BrowserNote>
+          <BrowserIcon>
+            <FontAwesomeIcon icon={faChrome} />
+          </BrowserIcon>
+          <span>
+            Keyboard connection requires a browser with{' '}
+            <Link
+              href="https://caniuse.com/?search=webhid"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              WebHID support
+            </Link>
+            . Use Chrome or Edge on desktop to connect your keyboard.
+          </span>
+        </BrowserNote>
+      </WelcomeContainer>
+    </WelcomeHome>
   ) : (
     <>{props.children}</>
   );
