@@ -39,21 +39,24 @@ const WelcomeHome = styled.div`
   background: var(--bg_gradient);
   display: flex;
   flex-direction: column;
-  flex-grow: 1;
-  overflow: auto;
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  z-index: 100;
 `;
 
 const WelcomeContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2rem 1.5rem;
+  padding: 2rem 1.5rem 3rem;
   color: var(--color_label);
+  width: 100%;
+  box-sizing: border-box;
 `;
 
 const Logo = styled.h1`
