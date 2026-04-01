@@ -1,4 +1,4 @@
-import {useState, FC, useRef, Dispatch, DragEvent, useMemo} from 'react';
+import {useState, FC, useRef, Dispatch, DragEvent, useMemo, useEffect} from 'react';
 import {Pane} from './pane';
 import styled from 'styled-components';
 import {ErrorMessage} from '../styled';
@@ -234,6 +234,43 @@ export const DesignTab: FC = () => {
   const selectedDefinitionIndex = useAppSelector(getSelectedDefinitionIndex);
   const showMatrix = useAppSelector(getShowMatrix);
   const [errors, setErrors] = useState<string[]>([]);
+  const [demoLoaded, setDemoLoaded] = useState(false);
+
+  // Auto-load demo keyboard when ?demo=true
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('demo') === 'true' && !demoLoaded) {
+      setDemoLoaded(true);
+      fetch('/demo-keyboard.json')
+        .then((res) => res.json())
+        .then((def) => {
+          const version: DefinitionVersion = 'v3';
+          if (isKeyboardDefinitionV3(def)) {
+            const viaDef = keyboardDefinitionV3ToVIADefinitionV3(def);
+            dispatch(loadCustomDefinitions({definitions: [viaDef], version}));
+            dispatch(
+              ensureSupportedIds({
+                productIds: [viaDef.vendorProductId],
+                version,
+              }),
+            );
+            dispatch(updateDesignDefinitionVersion('v3'));
+          } else if (isVIADefinitionV3(def)) {
+            dispatch(loadCustomDefinitions({definitions: [def], version}));
+            dispatch(
+              ensureSupportedIds({
+                productIds: [def.vendorProductId],
+                version,
+              }),
+            );
+            dispatch(updateDesignDefinitionVersion('v3'));
+          }
+          // Dismiss the warning dialog automatically in demo mode
+          sessionStorage.setItem('hideDesignWarning', '1');
+        })
+        .catch(console.error);
+    }
+  }, [demoLoaded]);
   const versionDefinitions: DefinitionVersionMap[] = useMemo(
     () =>
       localDefinitions.filter(

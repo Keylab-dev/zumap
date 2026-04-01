@@ -32,7 +32,7 @@ import {OVERRIDE_HID_CHECK} from 'src/utils/override';
 import {KeyboardValue} from 'src/utils/keyboard-api';
 import {useTranslation} from 'react-i18next';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faKeyboard, faPlug, faGlobe, faCodeBranch} from '@fortawesome/free-solid-svg-icons';
+import {faKeyboard, faPlug, faGlobe, faCodeBranch, faPlay} from '@fortawesome/free-solid-svg-icons';
 import {faChrome} from '@fortawesome/free-brands-svg-icons';
 
 const WelcomeHome = styled.div`
@@ -232,6 +232,30 @@ const KeyboardCount = styled.div`
   text-align: center;
 `;
 
+const DemoButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  background: var(--bg_control);
+  border: 1px solid var(--border_color_cell);
+  border-radius: 8px;
+  color: var(--color_label-highlighted);
+  font-family: 'Fira Sans', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 400;
+  padding: 0.85rem 2rem;
+  cursor: pointer;
+  margin-bottom: 1.5rem;
+  transition: border-color 0.15s;
+  max-width: 720px;
+  width: 100%;
+  box-sizing: border-box;
+  &:hover {
+    border-color: var(--color_accent);
+  }
+`;
+
 const ErrorHome = styled.div`
   background: var(--bg_gradient);
   display: flex;
@@ -427,7 +451,7 @@ export const Home: React.FC<HomeProps> = (props) => {
             </CardDesc>
           </ClickableCard>
 
-          <ClickableCard as="a" href="https://github.com/Keylab-dev/zumap" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
+          <ClickableCard onClick={() => window.open('https://github.com/Keylab-dev/zumap', '_blank')}>
             <CardIcon>
               <FontAwesomeIcon icon={faCodeBranch} />
             </CardIcon>
@@ -438,6 +462,16 @@ export const Home: React.FC<HomeProps> = (props) => {
             </CardDesc>
           </ClickableCard>
         </CardGrid>
+
+        <DemoButton
+          onClick={() => {
+            localStorage.setItem('override_hid_check', 'true');
+            window.location.href = '/design?demo=true';
+          }}
+        >
+          <FontAwesomeIcon icon={faPlay} />
+          Try the demo
+        </DemoButton>
 
         {showKeyboards && (
           <KeyboardBrowser>
