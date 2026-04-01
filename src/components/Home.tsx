@@ -1,4 +1,4 @@
-import React, {createRef, useEffect} from 'react';
+import React, {createRef, useEffect, useState, useCallback} from 'react';
 import styled from 'styled-components';
 import {getByteForCode} from '../utils/key';
 import {startMonitoring, usbDetect} from '../utils/usb-hid';
@@ -137,6 +137,79 @@ const Link = styled.a`
   text-decoration: underline;
 `;
 
+const ClickableCard = styled(Card)`
+  cursor: pointer;
+  transition: border-color 0.15s;
+  &:hover {
+    border-color: var(--color_accent);
+  }
+`;
+
+const CardHeader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
+
+const CardCount = styled.span`
+  font-size: 0.8rem;
+  opacity: 0.5;
+`;
+
+const KeyboardBrowser = styled.div`
+  max-width: 720px;
+  width: 100%;
+  margin-bottom: 1.5rem;
+`;
+
+const SearchInput = styled.input`
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border_color_cell);
+  border-radius: 8px;
+  background: var(--bg_control);
+  color: var(--color_label-highlighted);
+  font-family: 'Fira Sans', sans-serif;
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+  box-sizing: border-box;
+  outline: none;
+  &::placeholder {
+    color: var(--color_label);
+    opacity: 0.5;
+  }
+  &:focus {
+    border-color: var(--color_accent);
+  }
+`;
+
+const KeyboardList = styled.div`
+  max-height: 320px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--border_color_cell);
+  border-radius: 8px;
+  background: var(--bg_control);
+`;
+
+const KeyboardItem = styled.div`
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  color: var(--color_label);
+  border-bottom: 1px solid var(--border_color_cell);
+  &:last-child {
+    border-bottom: none;
+  }
+`;
+
+const KeyboardCount = styled.div`
+  font-size: 0.8rem;
+  color: var(--color_label);
+  opacity: 0.5;
+  padding: 0.5rem 0;
+  text-align: center;
+`;
+
 const ErrorHome = styled.div`
   background: var(--bg_gradient);
   display: flex;
@@ -251,6 +324,31 @@ export const Home: React.FC<HomeProps> = (props) => {
     // }
   }, [api]);
 
+  const [showKeyboards, setShowKeyboards] = useState(false);
+  const [keyboards, setKeyboards] = useState<string[]>([]);
+  const [search, setSearch] = useState('');
+
+  const toggleKeyboards = useCallback(async () => {
+    if (showKeyboards) {
+      setShowKeyboards(false);
+      return;
+    }
+    if (keyboards.length === 0) {
+      try {
+        const res = await fetch('/definitions/keyboard_names.json');
+        const data: string[] = await res.json();
+        setKeyboards(data);
+      } catch {
+        setKeyboards([]);
+      }
+    }
+    setShowKeyboards(true);
+  }, [showKeyboards, keyboards]);
+
+  const filteredKeyboards = search
+    ? keyboards.filter((k) => k.toLowerCase().includes(search.toLowerCase()))
+    : keyboards;
+
   return !hasHIDSupport && !OVERRIDE_HID_CHECK ? (
     <WelcomeHome ref={homeElem} tabIndex={0}>
       <WelcomeContainer>
@@ -269,16 +367,21 @@ export const Home: React.FC<HomeProps> = (props) => {
             </CardDesc>
           </Card>
 
-          <Card>
-            <CardIcon>
-              <FontAwesomeIcon icon={faKeyboard} />
-            </CardIcon>
-            <CardTitle>Hundreds of keyboards</CardTitle>
+          <ClickableCard onClick={toggleKeyboards}>
+            <CardHeader>
+              <CardIcon>
+                <FontAwesomeIcon icon={faKeyboard} />
+              </CardIcon>
+              {keyboards.length > 0 && (
+                <CardCount>{keyboards.length} keyboards</CardCount>
+              )}
+            </CardHeader>
+            <CardTitle>Supported keyboards</CardTitle>
             <CardDesc>
-              Supports a growing database of mechanical keyboards. If your board
-              runs VIA-compatible firmware, it works here.
+              Browse the full list of compatible mechanical keyboards. If your
+              board runs VIA-compatible firmware, it works here.
             </CardDesc>
-          </Card>
+          </ClickableCard>
 
           <Card>
             <CardIcon>
@@ -291,6 +394,28 @@ export const Home: React.FC<HomeProps> = (props) => {
             </CardDesc>
           </Card>
         </CardGrid>
+
+        {showKeyboards && (
+          <KeyboardBrowser>
+            <SearchInput
+              type="text"
+              placeholder="Search keyboards..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              autoFocus
+            />
+            <KeyboardList>
+              {filteredKeyboards.slice(0, 200).map((name) => (
+                <KeyboardItem key={name}>{name}</KeyboardItem>
+              ))}
+            </KeyboardList>
+            <KeyboardCount>
+              {search
+                ? `${filteredKeyboards.length} of ${keyboards.length} keyboards`
+                : `${keyboards.length} keyboards supported`}
+            </KeyboardCount>
+          </KeyboardBrowser>
+        )}
 
         <BrowserNote>
           <BrowserIcon>
