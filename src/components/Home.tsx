@@ -52,9 +52,7 @@ const WelcomeContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  min-height: 100%;
-  padding: 3rem 1.5rem;
+  padding: 2rem 1.5rem;
   color: var(--color_label);
 `;
 
