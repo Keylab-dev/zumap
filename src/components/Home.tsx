@@ -427,7 +427,7 @@ export const Home: React.FC<HomeProps> = (props) => {
             </CardDesc>
           </ClickableCard>
 
-          <Card>
+          <ClickableCard as="a" href="https://github.com/Keylab-dev/zumap" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
             <CardIcon>
               <FontAwesomeIcon icon={faCodeBranch} />
             </CardIcon>
@@ -436,7 +436,7 @@ export const Home: React.FC<HomeProps> = (props) => {
               Fork of VIA, actively maintained. Open source and welcoming
               contributions from the keyboard community.
             </CardDesc>
-          </Card>
+          </ClickableCard>
         </CardGrid>
 
         {showKeyboards && (
